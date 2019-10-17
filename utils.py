@@ -1,16 +1,28 @@
+"""
+script for useful functions to compute accuracies and confidences for the main2.py file
+"""
+
 import numpy as np
-
-
-
 def acc_cmf(y_coarse, y_middle, y_fine,y_testfine1 , dataset):
+    """
+    input :
+    - the predictions : y_coarse, y_middle, y_fine
+    - the groundtruth : y_testfine1
+    - the dataset
+    output :
+    the accuracy for each level of precision
+    """
+
+    #declare the list of the error ids
     not_nested = []
     error_coarse = []
     error_middle = []
     error_fine = []
     not_correct = set()
+
+    #the permutation of the label according to the chosen dataset
     perm_mnist = [3,5,8,6,0,4,7,9,2,1]
     #perm_mnist = [0,1,2,3,4,5,6,7,8,9]
-    perm_svhn = [3,5,8,6,0,4,7,9,2,1]
     perm_cifar10 = [0,8,1,9,2,6,3,5,4,7]
     perm_fmnist = [0,2,6,3,4,5,7,9,1,8]
     perm = [0,1,2,3,4,5,6,7,8,9]
@@ -21,11 +33,11 @@ def acc_cmf(y_coarse, y_middle, y_fine,y_testfine1 , dataset):
         perm = perm_mnist
     elif dataset == 'fashion_mnist':
         perm = perm_fmnist
-    elif dataset == 'SVHN':
-        perm = perm_svhn
+
 
 
     n = y_coarse.shape[0]
+    #computing the accuracies depending on the dataset
     for i in range(n):
         y1 = y_coarse[i,:]
         y2 = y_middle[i,:]
@@ -79,8 +91,17 @@ def acc_cmf(y_coarse, y_middle, y_fine,y_testfine1 , dataset):
     return(acc_c, acc_m, acc_f)
 
 def acc_cmf_single(y_pred,y_test_fine,dataset):
+    """
+    functions that compute the accuracy of the coarse, middle, and fine predictions
+    inferred from the single fine output of the single-output network
+    input :
+    - predictions : y_pred
+    - groundtruth : y_test_fine
+    - dataset
+    output :
+    acc_c, acc_m, acc_f
+    """
     perm_mnist = [3,5,8,6,0,4,7,9,2,1]
-    perm_svhn = [3,5,8,6,0,4,7,9,2,1]
     perm_cifar10 = [0,8,1,9,2,6,3,5,4,7]
     perm_fmnist = [0,2,6,3,4,5,7,9,1,8]
     perm = [0,1,2,3,4,5,6,7,8,9]
@@ -90,8 +111,6 @@ def acc_cmf_single(y_pred,y_test_fine,dataset):
         perm = perm_mnist
     elif dataset == 'fashion_mnist':
         perm = perm_fmnist
-    elif dataset == 'SVHN':
-        perm = perm_svhn
     n = y_pred.shape[0]
     c = 0
     m = 0
@@ -104,20 +123,6 @@ def acc_cmf_single(y_pred,y_test_fine,dataset):
         true = np.argmax(y_test_fine[i,:])
         if pred == true :
             f+=1
-        # else :
-        #     fn+=1
-        #     if (pred in [3,5,8]) and (true in [3,5,8]):
-        #         mm+=1
-        #     if (pred in [0,6]) and (true in [0,6]):
-        #         mm+=1
-        #     if (pred in [4,7,9]) and (true in [4,7,9]):
-        #         mm+=1
-        #     if (pred in [1,2]) and (true in [1,2]):
-        #         mm+=1
-        #     if (pred in [0,3,5,8,6]) and (true in [0,3,5,8,6]):
-        #         cc+=1
-        #     if (pred in [1,2,4,7,9]) and (true in [1,2, 4, 7, 9]):
-        #         cc+=1
         if dataset == 'cifar10':
             if (pred in perm[0:2]) and (true in perm[0:2]):
                 m+=1
@@ -151,8 +156,11 @@ def acc_cmf_single(y_pred,y_test_fine,dataset):
     acc_f = f/n
     return(acc_c,acc_m,acc_f)
 def conf_cmf_single(y_pred,dataset):
+    """
+    function that computes the confidence of the coarse, midddle and fine predictions,
+    inferred from the single-output network predictions on the test set.
+    """
     perm_mnist = [3,5,8,6,0,4,7,9,2,1]
-    perm_svhn = [3,5,8,6,0,4,7,9,2,1]
     perm_cifar10 = [0,8,1,9,2,6,3,5,4,7]
     perm_fmnist = [0,2,6,3,4,5,7,9,1,8]
     perm = [0,1,2,3,4,5,6,7,8,9]
@@ -162,8 +170,6 @@ def conf_cmf_single(y_pred,dataset):
         perm = perm_mnist
     elif dataset == 'fashion_mnist':
         perm = perm_fmnist
-    elif dataset == 'SVHN':
-        perm = perm_svhn
     n = y_pred.shape[0]
     conf_c, conf_m, conf_f = 0,0,0
     conf_f = np.mean(np.max(y_pred,axis = 1))

@@ -1,3 +1,6 @@
+
+#%% IMPORTS
+
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
@@ -5,13 +8,15 @@ import tensorflow as tf
 import scipy.misc
 import math
 import os
-plt.style.use('ggplot')
-plt.style.use('dark_background')
 import pandas as pd
 from tensorflow.keras.datasets import mnist
+
+## importing useful functions
 from utils_calibration import *
 from preprocessing import *
 
+
+## defining the arguments for the calibration step
 parser = argparse.ArgumentParser(description='Calibration and combination')
 parser.add_argument('--dataset', type=str, default='mnist', metavar='D',
                     help='the dataset on which to execute the program')
@@ -35,6 +40,7 @@ parser.add_argument('--single', type=bool, default=False, metavar='SI',
                     help='True if training the single model network')
 parser.add_argument('--FT', type=bool, default=False, metavar='FT',
                     help='True if fine tuning the fine classification')
+
 args = parser.parse_args()
 id = args.model_id
 c = args.coarse_rate
@@ -227,7 +233,7 @@ if args.traintime :
     resf_scaled_original, T_fine = optimal_scale(40,resf_0,y_test_fine)
     T_s = np.array([T_coarse,T_middle, T_fine])
     np.save('weights/weights_{}/temperatures_{}_id{}c{}m{}f{}.npy'.format(args.dataset,args.dataset,id,c,m,f), T_s)
-T_s = np.load('weights/weights_{}/temperatures_{}_id{}c{}m{}f{}.npy'.format(args.dataset,args.dataset,id,c,m,f))   
+T_s = np.load('weights/weights_{}/temperatures_{}_id{}c{}m{}f{}.npy'.format(args.dataset,args.dataset,id,c,m,f))
 T_coarse = T_s[0]
 T_middle = T_s[1]
 T_fine = T_s[2]
@@ -268,20 +274,20 @@ elif args.dataset == 'SVHN':
     perm = perm_svhn
 
 if args.dataset =='cifar10':
-    
-    
+
+
     resc_2fine = np.array([np.array([0.25*resc_scaled[i,0] for k in range(4)]+[0.166*resc_scaled[i,1] for k in range(6)]) for i in range(2000)])
-    resm_2fine = 0.5*np.array([np.array([resm_scaled[i,0] for k in range(2)] 
+    resm_2fine = 0.5*np.array([np.array([resm_scaled[i,0] for k in range(2)]
                                +[resm_scaled[i,1] for k in range(2)]+
                                [resm_scaled[i,2] for k in range(2)]+
-                               [resm_scaled[i,3]for k in range(2)]+ 
-                               [resm_scaled[i,4]for k in range(2)]) for i in range(2000)])    
+                               [resm_scaled[i,3]for k in range(2)]+
+                               [resm_scaled[i,4]for k in range(2)]) for i in range(2000)])
     resc_2fine_original = np.array([np.array([0.25*resc_scaled_original[i,0] for k in range(4)]+[0.166*resc_scaled_original[i,1] for k in range(6)]) for i in range(2000)])
     resm_2fine_original = 0.5*np.array([np.array([resm_scaled_original[i,0] for k in range(2)]+[resm_scaled_original[i,1] for k in range(2)]+[resm_scaled_original[i,2] for k in range(2)]+[resm_scaled_original[i,3] for k in range(2)]+[resm_scaled_original[i,4] for k in range(2)]) for i in range(2000)])
 
 else :
-    
-    
+
+
     resc_2fine = 0.2*np.array([np.array([resc_scaled[i,0] for k in range(5)]+[resc_scaled[i,1] for k in range(5)]) for i in range(2000)])
     resm_2fine = 0.5*np.array([np.array([resm_scaled[i,0] for k in range(3)]+[resm_scaled[i,1] for k in range(2)]+[resm_scaled[i,2] for k in range(3)]+[resm_scaled[i,3]for k in range(2)]) for i in range(2000)])
     resc_2fine_original = 0.2*np.array([np.array([resc_scaled_original[i,0] for k in range(5)]+[resc_scaled_original[i,1] for k in range(5)]) for i in range(2000)])
@@ -397,5 +403,3 @@ print(acc_prod)
 
 df = df.append({'perturbation':per_name, 'coarse_acc':mean_acc_c_per,'middle_acc':mean_acc_m_per,'fine_acc':mean_acc_f_per, 'MV':acc_mv,'WMV':acc_wmv,'Mean':acc_mean,'Product':acc_prod,'C&F':acc_fc,'M&F':acc_fm,'C&M&F':acc_cmf , 'Middle' : acc_mc }, ignore_index=True)
 df.to_csv('results/calibrated_results_{}_id{}_c{}_m{}_f{}.csv'.format(args.dataset,id,c, m,f), index=False)
-
-
