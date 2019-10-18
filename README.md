@@ -3,7 +3,7 @@ This anonymous github repository corresponds to the code for the ICLR 2020 submi
 ![Architecture](https://github.com/nestedlearning2019/code_iclr/blob/master/framework.png) "Illustrative scheme of the proposed framework"    
 h<sub>&theta;</sub>(x) = &theta;<sub>o</sub> x + &theta;<sub>1</sub>x
 From left to right, the input data x, a first set of layers that extract from X a feature representation f<sub> 1 </sub>;
-  which leads to 	&#374;<sub> 1 </sub>; (estimation of the coarse label Y<sub>1</sub>). f_<sub>1<\sub> is then jointly exploited in addition with complementary information of the input. This leads to a second representation f<sub>2<\sub> from which a finer classification is obtained. The same idea is repeated until the fine level of classification is achieved.
+  which leads to 	&#374;<sub> 1 </sub>; (estimation of the coarse label Y<sub> 1 </sub>). f<sub> 1 <\sub> is then jointly exploited in addition with complementary information of the input. This leads to a second representation f<sub> 2 <\sub> from which a finer classification is obtained. The same idea is repeated until the fine level of classification is achieved.
 
 We will present in this readme the general conditions to run the code.
 
