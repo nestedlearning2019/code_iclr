@@ -47,3 +47,26 @@ $python3 main2.py --dataset "mnist"--model-id 0 --coarse-rate 80.0 --middle-rate
 ```
 Running this two lines will result in the creation of a csv file in the results directory with the name **'results\_mnist\_id0\_c80\.0\_m50.0\_f20.0.csv'**. Each line of this .csv file stores the accuracies and confidences of the coarse, middle and fine classifier, the perturbation type we tested the model on, and the type of model (single output vs single output).
 
+### Running `calibration.py`
+
+Once the training of the model is done with the `main2.py` execution, we can try the calibration and combination methods. To calibrate the results, we also need a train and test step. It is because we need to fit the calibration parameters on the original distribution, and not on the test distribution which could have been disturbed by one of the coded functions. However, the train mode also tests our combination methods on the original distribution. This parameter is here so that we don't need to retrain everything at every run.
+
+#### Training
+
+Following the same example as before, we now want to calibrate the model. To do that we can run the following command line :
+```
+$python3 calibration.py --dataset "mnist" --traintime True --model-id 0 --coarse-rate 80.0 --middle-rate 50.0 --fine-rate 20.0 --perturbation "original" 
+```
+This will result in the following updates :
+* the weights **"weights/weights\_mnist/\[granularity level\]\_last\_layer\_id0\_c80.0\_m50.0\_20.0.h5"** will be created and trained.
+* The temperature parameter of the scaling step will be created and optimized, and stored in the corresponding weights files.
+* The calibrated + combination result file for this model will be created and updated with the results of the combination methods. These results are stored in **"results/calibrated\_results\_mnist\_id0\_c80.0\_m50.0\_20.0.csv"**. Each line of this file contains the results of the calibration with accuracies and confidences before combinations, the type of perturbation tested, and the accuracies for all the combination methods coded in our `utils_calibration.py` file.
+
+#### Testing
+
+Now that the calibration parameters are fitted, we can test the method on perturbed data. By running this line for example :
+```
+$python3 calibration.py --dataset "mnist" --model-id 0 --coarse-rate 80.0 --middle-rate 50.0 --fine-rate 20.0 --perturbation "warp" --s 1.0 --t 1.0
+```
+we add the corresponding line to **"results/calibrated\_results\_mnist\_id0\_c80.0\_m50.0\_20.0.csv"**.
+
